@@ -509,6 +509,7 @@ int Buffer_AppendDoubleUnchecked(JSOBJ obj, JSONObjectEncoder *enc, double value
 {
   /* if input is larger than thres_max, revert to exponential */
   const double thres_max = (double) 1e16 - 1;
+  const double thres_min = (double) 1e-16;
   int count;
   double diff = 0.0;
   char* str = enc->offset;
@@ -571,7 +572,7 @@ int Buffer_AppendDoubleUnchecked(JSOBJ obj, JSONObjectEncoder *enc, double value
   normal printf behavior is to print EVERY whole number digit
   which can be 100s of characters overflowing your buffers == bad
   */
-  if (value > thres_max)
+  if ((value > thres_max) || (value < thres_min))
   {
 #ifdef _WIN32
   enc->offset += sprintf_s(str, enc->end - enc->offset, "%.15e", neg ? -value : value);
